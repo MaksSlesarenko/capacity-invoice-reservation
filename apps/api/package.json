@@ -1,0 +1,12 @@
+{
+  "name": "@capacity/api",
+  "version": "0.1.0",
+  "dependencies": {
+    "@capacity/core": "*",
+    "fastify": "^4.28.1",
+    "jsonwebtoken": "^9.0.2"
+  },
+  "devDependencies": {
+    "@types/jsonwebtoken": "^9.0.6"
+  }
+}

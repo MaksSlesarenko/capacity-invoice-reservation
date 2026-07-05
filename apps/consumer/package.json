@@ -1,0 +1,8 @@
+{
+  "name": "@capacity/consumer",
+  "version": "0.1.0",
+  "dependencies": {
+    "@capacity/core": "*",
+    "kafkajs": "^2.2.4"
+  }
+}

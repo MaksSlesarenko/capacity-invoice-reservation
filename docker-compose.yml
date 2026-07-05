@@ -1,0 +1,54 @@
+version: '3.8'
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: capacity
+    ports:
+      - '5432:5432'
+    volumes:
+      - ./db/init:/docker-entrypoint-initdb.d
+      - pgdata:/var/lib/postgresql/data
+
+  redpanda:
+    image: docker.redpanda.com/redpandadata/redpanda:v24.2.4
+    command:
+      - redpanda
+      - start
+      - --smp=1
+      - --overprovisioned
+      - --node-id=0
+      - --kafka-addr=PLAINTEXT://0.0.0.0:9092
+      - --advertise-kafka-addr=PLAINTEXT://redpanda:9092
+    ports:
+      - '9092:9092'
+
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    environment:
+      DATABASE_URL: postgres://postgres:postgres@postgres:5432/capacity
+      JWT_SECRET: dev-secret-change-me
+      CLIENTS_JSON: '{"demo-client":"demo-secret"}'
+      PORT: '3000'
+    ports:
+      - '3000:3000'
+    depends_on:
+      - postgres
+
+  consumer:
+    build:
+      context: .
+      dockerfile: apps/consumer/Dockerfile
+    environment:
+      DATABASE_URL: postgres://postgres:postgres@postgres:5432/capacity
+      KAFKA_BROKERS: redpanda:9092
+    depends_on:
+      - postgres
+      - redpanda
+
+volumes:
+  pgdata:
